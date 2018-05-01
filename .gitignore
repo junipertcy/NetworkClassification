@@ -66,5 +66,6 @@ target/
 # any .csv and .txt files
 *.csv
 *.txt
+!requirements.txt
 
 .idea/

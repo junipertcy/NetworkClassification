@@ -35,7 +35,6 @@ def multiclass_classification(X, Y, sub_to_main_type, feature_names, isSubType, 
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = Y[train_index], Y[test_index]
 
-
     if samplingMethod == "RandomOver":
         random_over = RandomOverSampler()
         sampled_x, sampled_y = random_over.fit_sample(X_train, y_train)
@@ -88,4 +87,3 @@ def multiclass_classification(X, Y, sub_to_main_type, feature_names, isSubType, 
     y_pred = random_forest.predict(X_test)
     cm = confusion_matrix(y_test, y_pred, labels=NetworkTypeLabels)
     return cm, NetworkTypeLabels, accuracy, feature_importances
-

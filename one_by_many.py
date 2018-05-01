@@ -49,7 +49,7 @@ def one_to_many_classification(X_train, X_test, y_train, y_test, feature_order):
     accuracy = random_forest.score(X_test, y_test)
     y_pred = random_forest.predict(X_test)
     feature_importance = sorted(zip(map(lambda x: round(x, 4), random_forest.feature_importances_), feature_order),
-                                 reverse=True)
+                                reverse=True)
     AUC = roc_auc_score(y_test, y_pred)
 
     return accuracy, feature_importance, AUC
@@ -63,7 +63,8 @@ def many_classifications(X, Y, feature_order, N):
     list_accuracies = []
     list_auc = []
     for i in range(N):
-        print "i:%d" % i
+        print
+        "i:%d" % i
         X_train, X_test, y_train, y_test = split_train_test(X, Y)
         accuracy, feature_importances, auc = one_to_many_classification(X_train, X_test, y_train, y_test, feature_order)
         list_important_features.append(feature_importances)
@@ -89,8 +90,10 @@ def main():
     list_accuracies, list_important_features, list_auc = many_classifications(X_converted, Y_converted,
                                                                               sub_to_main_type, feature_order, N)
 
-    print "average accuracy: %f" % (float(sum(list_accuracies)) / float(N))
-    print "average AUC: %f" % (float(sum(list_auc)) / float(N))
+    print
+    "average accuracy: %f" % (float(sum(list_accuracies)) / float(N))
+    print
+    "average AUC: %f" % (float(sum(list_auc)) / float(N))
 
     dominant_features = plot_feature_importance(list_important_features, feature_order)
 
@@ -99,8 +102,10 @@ def main():
     if first == second:
         second = dominant_features[1][1][0]
     Y_converted_string_labels = [one if y == 1 else "Other" for y in Y_converted]
-    print "first: ", first
-    print "second: ", second
+    print
+    "first: ", first
+    print
+    "second: ", second
 
     x_label = first
     y_label = second

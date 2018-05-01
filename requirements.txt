@@ -1,0 +1,18 @@
+# Library dependencies for the python code.  You need to install these with
+# `pip install -r requirements.txt` before you can run this.
+
+#### ESSENTIAL LIBRARIES FOR MAIN FUNCTIONALITY ####
+
+# ToWrite.
+python-igraph
+networkx
+
+# ToWrite.
+matplotlib
+numpy
+scipy
+imbalanced-learn
+scikit-learn
+
+# Tutorial notebooks
+jupyter

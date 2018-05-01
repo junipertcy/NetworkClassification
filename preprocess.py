@@ -27,8 +27,8 @@ def data_read(filepath, *features, **kwargs):
 
             # below is for extracting only specific kinds of networks
             elif row["NetworkType"] in kwargs.get("inclusive_types", []):
-                    gml_name = row[".gmlFile"]
-                    network_dict[gml_name] = filtered
+                gml_name = row[".gmlFile"]
+                network_dict[gml_name] = filtered
 
             else:
                 gml_name = row[".gmlFile"]
