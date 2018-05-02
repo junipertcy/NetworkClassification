@@ -9,6 +9,8 @@ import matplotlib.cm as cmx
 from mpl_toolkits.mplot3d import Axes3D
 from preprocess import *
 
+import click
+
 # colors each corresponds to network domain
 colors_domain = ["#ff0000", "#9c8110", "#00d404", "#00a4d4", "#1d00d4", "#a400c3", "#831e1e"]
 
@@ -331,7 +333,7 @@ def matrix_clustering(D, leave_name):
     axmatrix = fig.add_axes([0.3, 0.1, 0.6, 0.6])
     idx1 = Z1['leaves']
     idx2 = Z2['leaves']
-    print(D)
+    # print(D)
 
     D = D[idx1, :]
     D = D[:, idx2]
@@ -339,7 +341,7 @@ def matrix_clustering(D, leave_name):
 
     # mapping from an index to an axis label (gml file name, NetworkType, SubType)
     axis_labels = [leave_name[i] for i in idx1]
-    print(idx1)
+    # print(idx1)
 
     tick_marks = np.arange(len(axis_labels))
     axmatrix.yaxis.set_label_position('right')
@@ -417,17 +419,19 @@ def main():
     plot_3d(network_tuple, feature_names)
 
 
-def main2():
+@click.command()
+@click.option('--csv', nargs=1, type=str, help='CSV data for the features.')
+@click.option('--features', nargs=2, type=str, help='The 2 features for visualization.')
+def main2(csv, features):
     # this main2() is for plotting data points in 2D space of selected features.
-    x_label = "MeanGeodesicDistance"
-    y_label = "Modularity"
+    x_label, y_label = features
+    csv_file = csv
     column_names = ["NetworkType", "SubType", x_label, y_label]
     exclusive_types = ["Economic"]
-    isSubType = False
+    isSubType = True
     at_least = 0
-    X, Y, sub_to_main_type, feature_order = init("features.csv", column_names, isSubType, at_least,
+    X, Y, sub_to_main_type, feature_order = init(csv_file, column_names, isSubType, at_least,
                                                  exclusive_types=exclusive_types)
-    print(list(feature_order))
     # x_index = list(feature_order).index(x_label)
     # y_index = list(feature_order).index(y_label)
     x_index = 0  # TODO: hot-fix

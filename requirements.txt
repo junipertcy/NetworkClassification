@@ -16,3 +16,6 @@ scikit-learn
 
 # Tutorial notebooks
 jupyter
+
+# Make some parts of the library into command line excutables
+click>=6.7

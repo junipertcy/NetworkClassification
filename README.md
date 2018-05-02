@@ -1,12 +1,14 @@
 # NetworkClassification
 
-This repository contains the code for my M.S. thesis research titled
- "Structure of Complex Networks across Domains."
+This repository contains the code for the M.S. thesis research titled
+"Structure of Complex Networks across Domains" by Kansuke Ikehara (@kansuke231).
+The thesis was enriched to [arXiv](https://arxiv.org/abs/1710.11304) with the titile, "
+Characterizing the structural diversity of complex networks across domains".
 
 ## Data
 First thing first, we need data in order to analyze something. Code in this repo
  assumes the data, namely features of networks, is stored in a csv file named
- "features.csv" which looks like this:
+ `features.csv` which looks like this:
 
 ```
 .gmlFile,NetworkType,SubType,NumberOfNodes,NumberOfEdges,MeanDegree,MeanGeodesicDistance,...

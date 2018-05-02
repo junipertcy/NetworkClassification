@@ -111,7 +111,9 @@ def main():
     second = dominant_features[1][0][0]
     if first == second:
         second = dominant_features[1][1][0]
+
     Y_converted_string_labels = [one if y == 1 else "Other" for y in Y_converted]
+
     print("first: ", first)
     print("second: ", second)
 
