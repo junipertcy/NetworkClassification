@@ -1,0 +1,9 @@
+.gmlFile,NetworkType,SubType,NumberOfNodes,NumberOfEdges,MeanDegree,MeanGeodesicDistance,Modularity
+karate.gml,Social,Offline Social,62,152,4.9032,2.9455,0.323
+malaria.gml,Biological,Offline Social,62,152,4.9032,2.9455,0.912
+net1.gml,Biological,Offline Social,31,102,4.9032,2.9455,0.892
+net2.gml,Biological,Offline Social,45,439,3.3032,6.9755,0.612
+net3.gml,Biological,Offline Social,76,552,4.1032,3.455,0.312
+net4.gml,Biological,Offline Social,43,452,4.2032,1.5455,0.212
+net5.gml,Biological,Offline Social,63,132,4.4032,2.6455,0.412
+net6.gml,Biological,Offline Social,26,154,7.6032,3.7455,0.512
