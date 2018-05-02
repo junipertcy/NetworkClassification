@@ -11,13 +11,13 @@ def data_read(filepath, *features, **kwargs):
      values are value of the feature).
     """
     network_dict = {}
-    with open(filepath, 'rb') as f:
+    with open(filepath, 'r') as f:
         reader = csv.DictReader(f)
         for row in reader:
 
             filtered = dict((k, v) for k, v in row.items() if all([(k in features), v, (v != "nan")]))
-
-            # if filtered lacks some feautres, e.g. not calculated yet.
+            # print("filtered = ", filtered)
+            # if filtered lacks some features, e.g. not calculated yet.
             if len(filtered) != len(features):
                 continue
 
@@ -32,6 +32,7 @@ def data_read(filepath, *features, **kwargs):
 
             else:
                 gml_name = row[".gmlFile"]
+                # print('gml_name = ', gml_name)
                 network_dict[gml_name] = filtered
 
     return network_dict
@@ -69,7 +70,10 @@ def XY_filter_unpopular(X, Y, threshold):
     filters out the elements which are unpopular (i.e. # of ys is below threshold).
     """
     counts = Counter(Y)
-    popular = [elem for (elem, count) in filter(lambda (e, c): c > threshold, counts.most_common())]
+    popular = [item[0] for item in counts.most_common() if item[1] > threshold]
+
+    # popular = []  # TODO: ad-hoc fix
+    # popular = [elem for (elem, count) in filter(lambda (e, c): c > threshold, counts.most_common())]
     return np.concatenate(tuple(X[Y == p] for p in popular), axis=0), \
            np.concatenate(tuple(Y[Y == p] for p in popular), axis=0)
 
@@ -91,15 +95,17 @@ def init(filepath, column_names, isSubType, at_least, **kwargs):
     network_dict = data_read(filepath, *column_names, **kwargs)
 
     network_dict = filter_float(network_dict)
+    # print("network_dict = ", network_dict)
     features, labels = XY_generator(network_dict)
 
     v = DictVectorizer(sparse=False)
+    # print("features = ", features)
     X = v.fit_transform(features)
 
     feature_order = map(lambda x: x[0], sorted(v.vocabulary_.items(), key=lambda x: x[1]))
 
     sub_to_main_type = dict((SubType, NetworkType) for gml, NetworkType, SubType in labels)
-
+    print("IMPORTANT labels: {}".format(labels))
     if isSubType:
         Y = np.array([SubType for gml, NetworkType, SubType in labels])
     else:
@@ -107,4 +113,4 @@ def init(filepath, column_names, isSubType, at_least, **kwargs):
 
     X, Y = XY_filter_unpopular(X, Y, at_least)
 
-    return X, Y, sub_to_main_type, feature_order
+    return X, Y, sub_to_main_type, list(feature_order)

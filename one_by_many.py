@@ -48,8 +48,12 @@ def one_to_many_classification(X_train, X_test, y_train, y_test, feature_order):
 
     accuracy = random_forest.score(X_test, y_test)
     y_pred = random_forest.predict(X_test)
-    feature_importance = sorted(zip(map(lambda x: round(x, 4), random_forest.feature_importances_), feature_order),
-                                reverse=True)
+
+    feature_importance = sorted(
+        zip(map(lambda x: round(x, 4), random_forest.feature_importances_), feature_order), reverse=True
+    )
+
+    print("y_test:{}; y_pred:{}".format(y_test, y_pred))
     AUC = roc_auc_score(y_test, y_pred)
 
     return accuracy, feature_importance, AUC
@@ -59,13 +63,15 @@ def many_classifications(X, Y, feature_order, N):
     """
     Does one_to_many_classification N times and aggregate the outputs from it.
     """
+    print("X: {}; Y: {}".format(X, Y))
+
     list_important_features = []
     list_accuracies = []
     list_auc = []
     for i in range(N):
-        print
-        "i:%d" % i
+        print("i:%d" % i)
         X_train, X_test, y_train, y_test = split_train_test(X, Y)
+        # print("X_train: {}; y_train:{}".format(X_train, y_train))
         accuracy, feature_importances, auc = one_to_many_classification(X_train, X_test, y_train, y_test, feature_order)
         list_important_features.append(feature_importances)
         list_accuracies.append(accuracy)
@@ -75,25 +81,29 @@ def many_classifications(X, Y, feature_order, N):
 
 
 def main():
-    column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity", "m4_1", "m4_2", "m4_3",
-                    "m4_4", "m4_5", "m4_6"]
+    # column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity", "m4_1", "m4_2", "m4_3",
+    #                 "m4_4", "m4_5", "m4_6"]
+    # column_names = ["NetworkType", "SubType", "MeanDegree", "MeanGeodesicDistance", "Modularity"]
 
-    isSubType = True
-    at_least = 1
-    X, Y, sub_to_main_type, feature_order = init("features.csv", column_names, isSubType, at_least)
-    N = 100
+    column_names = ["NetworkType", "SubType", "sepal_length", "sepal_width", "petal_length", "petal_width"]
+
+    isSubType = True  # use SubType as the labels for classification
+    at_least = 0
+    X, Y, sub_to_main_type, feature_order = init("iris.csv", column_names, isSubType, at_least)
+
+    N = 14
 
     # network subtype one is interested in
-    one = "Communication"
+    one = "versicolor"
 
     X_converted, Y_converted = convert_one_to_many(X, Y, one)
-    list_accuracies, list_important_features, list_auc = many_classifications(X_converted, Y_converted,
-                                                                              sub_to_main_type, feature_order, N)
+    print("Y_converted: {}".format(Y_converted))
+    list_accuracies, list_important_features, list_auc = many_classifications(
+        X_converted, Y_converted, feature_order, N
+    )
 
-    print
-    "average accuracy: %f" % (float(sum(list_accuracies)) / float(N))
-    print
-    "average AUC: %f" % (float(sum(list_auc)) / float(N))
+    print("average accuracy: %f" % (float(sum(list_accuracies)) / float(N)))
+    print("average AUC: %f" % (float(sum(list_auc)) / float(N)))
 
     dominant_features = plot_feature_importance(list_important_features, feature_order)
 
@@ -102,10 +112,8 @@ def main():
     if first == second:
         second = dominant_features[1][1][0]
     Y_converted_string_labels = [one if y == 1 else "Other" for y in Y_converted]
-    print
-    "first: ", first
-    print
-    "second: ", second
+    print("first: ", first)
+    print("second: ", second)
 
     x_label = first
     y_label = second

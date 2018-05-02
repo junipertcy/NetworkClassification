@@ -3,10 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.cluster.hierarchy as sch
 
-NetworkTypeLabels = ['Gene regulation', 'Proteins', 'Food Web', 'Fungal', 'Metabolic', 'Connectome', \
-                     'PeerToPeer', 'Bayesian', 'Web Graph', 'Offline Social', 'Online Social', 'Affiliation', \
+NetworkTypeLabels = ['Gene regulation', 'Proteins', 'Food Web', 'Fungal', 'Metabolic', 'Connectome',
+                     'PeerToPeer', 'Bayesian', 'Web Graph', 'Offline Social', 'Online Social', 'Affiliation',
                      'Forest Fire Network', 'Scale Free', 'Small World', 'ER Network', 'Water Distribution',
-                     'Software Dependency', \
+                     'Software Dependency',
                      'Communication', 'Digital Circuit', 'Subway', 'Roads']
 
 N = len(NetworkTypeLabels)
@@ -68,22 +68,18 @@ def main():
     combined = zip(none, random_over, random_under, smote)
 
     for first, second in itertools.permutations(NetworkTypeLabels, 2):
-        combined = zip(none, random_over, random_under, smote)
+        combined = list(zip(none, random_over, random_under, smote))
         i = NetworkTypeLabels.index(first)
         j = NetworkTypeLabels.index(second)
         e_i = combined[i]
         e_j = combined[j]
 
-        print
-        first, second
-        print
-        e_i, e_j
+        print(first, second)
+        print(e_i, e_j)
 
         num_overlaps = count_overlaps(e_i, e_j)
-        print
-        num_overlaps
-        print
-        "-------------------"
+        print(num_overlaps)
+        print("-------------------")
         matrix[i][j] = 4 - num_overlaps
 
     # for i in range(N):

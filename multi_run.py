@@ -22,8 +22,7 @@ def sum_confusion_matrix(X, Y, sub_to_main_type, feature_order, isSubType, sampl
     list_important_features = [feature_importances]
 
     for i in range(N - 1):
-        print
-        "i: ", i
+        print("i: ", i)
         cm, _, accuracy, feature_importances = multiclass_classification(X, Y, sub_to_main_type, feature_order,
                                                                          isSubType, samplingMethod)
         accum_matrix += cm
@@ -107,10 +106,8 @@ def graph_draw(G, NetworkTypeLabels, sub_to_main_type):
 
     # color_map = index_to_color(Domains,"hsv")
     color_map = lambda i: colors_domain[i]
-    print
-    NetworkTypeLabels
-    print
-    sub_to_main_type
+    print(NetworkTypeLabels)
+    print(sub_to_main_type)
     colors = [color_map(Domains.index(sub_to_main_type[sub_domain])) for sub_domain in NetworkTypeLabels]
 
     minimum = min_or_max(G, min)  # the minimum of weights
@@ -151,31 +148,28 @@ def make_adj_matrix(cm):
 
 def main():
     # The order in this list should be the same as columns in features.csv
-    column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity",
-                    "m4_1", "m4_2", "m4_3", "m4_4", "m4_5", "m4_6"]
-
+    # column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity",
+    #                 "m4_1", "m4_2", "m4_3", "m4_4", "m4_5", "m4_6"]
+    column_names = ["NetworkType", "SubType", "sepal_length", "sepal_width", "petal_length", "petal_width"]
     isSubType = True
 
     # at_least is used for filtering out classes whose instance is below this threshold.
     at_least = 6
-    X, Y, sub_to_main_type, feature_order = init("features.csv", column_names, isSubType, at_least)
+    X, Y, sub_to_main_type, feature_order = init("iris.csv", column_names, isSubType, at_least)
 
     # the number of iteration for multi-class classification
     N = 10
 
     # Valid methods are: "RandomOver", "RandomUnder", "SMOTE" and "None"
     sampling_method = "None"
-    print
-    "sampling_method: %s" % sampling_method
-    print
-    "Number of instances: %d" % len(Y)
+    print("sampling_method: %s" % sampling_method)
+    print("Number of instances: %d" % len(Y))
 
     Matrix, NetworkTypeLabels, sum_accuracy, list_important_features = \
         sum_confusion_matrix(X, Y, sub_to_main_type, feature_order, isSubType, sampling_method, N)
 
     average_matrix = np.asarray(map(lambda row: map(lambda e: e / N, row), Matrix))
-    print
-    "average accuracy: %f" % (float(sum_accuracy) / float(N))
+    print("average accuracy: %f" % (float(sum_accuracy) / float(N)))
     plot_feature_importance(list_important_features, feature_order)
 
     if not isSubType:

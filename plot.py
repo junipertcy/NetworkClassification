@@ -50,7 +50,11 @@ def sort_by_feature(network_dict, feature_names):
 
 
 def normalize_mgd(network_tuple):
-    return map(lambda (x1, x2, x3, x4, x5): (x1, x2, x3, x4 / math.log(x5)), network_tuple)
+    output = []
+    for item in network_tuple:
+        output += [(item[0], item[1], item[2], item[3] / math.log(item[4]))]
+    return output
+    # return map(lambda (x1, x2, x3, x4, x5): (x1, x2, x3, x4 / math.log(x5)), network_tuple)
 
 
 def plot_3d(data, feature_names):
@@ -327,16 +331,15 @@ def matrix_clustering(D, leave_name):
     axmatrix = fig.add_axes([0.3, 0.1, 0.6, 0.6])
     idx1 = Z1['leaves']
     idx2 = Z2['leaves']
-    print
-    D
+    print(D)
+
     D = D[idx1, :]
     D = D[:, idx2]
     im = axmatrix.matshow(D, aspect='auto', origin='lower', cmap=pylab.cm.YlGnBu)
 
     # mapping from an index to an axis label (gml file name, NetworkType, SubType)
-    axis_labels = [leave_name[i] for i in idx1];
-    print
-    idx1
+    axis_labels = [leave_name[i] for i in idx1]
+    print(idx1)
 
     tick_marks = np.arange(len(axis_labels))
     axmatrix.yaxis.set_label_position('right')
@@ -376,7 +379,11 @@ def plot_feature_importance(Ls, feature_order):
 
     for i, k in enumerate(iterate[1:]):
         colorVal = color_map(i + 1)
-        p = plt.bar(range(1, len(feature_order) + 1), freq[k], 0.35, color=colorVal, bottom=prev)
+
+        # TODO: hot-fix; re-write it later
+        # p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal), bottom=list(prev))
+        p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal))
+
         who_is_dominant.append(map(lambda x: (k, x), freq[k]))
         prev = map(lambda x: x[0] + x[1], zip(prev, freq[k]))
         ps.append(p)
@@ -384,8 +391,7 @@ def plot_feature_importance(Ls, feature_order):
     ranking = []
 
     for rank in zip(*who_is_dominant):
-        print
-        sorted(rank, key=lambda x: x[1], reverse=True)
+        print(sorted(rank, key=lambda x: x[1], reverse=True))
         ranking.append(sorted(rank, key=lambda x: x[1], reverse=True))
 
     plt.legend(ps, iterate, bbox_to_anchor=(1.3, 0.4), prop={'size': 16})
@@ -418,13 +424,14 @@ def main2():
     column_names = ["NetworkType", "SubType", x_label, y_label]
     exclusive_types = ["Economic"]
     isSubType = False
-    at_least = 1
+    at_least = 0
     X, Y, sub_to_main_type, feature_order = init("features.csv", column_names, isSubType, at_least,
                                                  exclusive_types=exclusive_types)
-
-    x_index = feature_order.index(x_label)
-    y_index = feature_order.index(y_label)
-
+    print(list(feature_order))
+    # x_index = list(feature_order).index(x_label)
+    # y_index = list(feature_order).index(y_label)
+    x_index = 0  # TODO: hot-fix
+    y_index = 1
     plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=True, ylog_scale=True)
 
 

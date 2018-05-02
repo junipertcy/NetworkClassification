@@ -63,9 +63,4 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
-# any .csv and .txt files
-*.csv
-*.txt
-!requirements.txt
-
 .idea/
