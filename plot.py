@@ -99,7 +99,7 @@ def plot_confusion_matrix(cm, NetworkTypeLabels, sub_to_main_type, isSubType, fi
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
     # set 0.0 if the value of a cell is NaN
-    cm_normalized_filtered = map(lambda ax: map(lambda val: 0.0 if math.isnan(val) else val, ax), cm_normalized)
+    cm_normalized_filtered = list(map(lambda ax: list(map(lambda val: 0.0 if math.isnan(val) else val, ax)), cm_normalized))
 
     f, ax = plt.subplots()
 

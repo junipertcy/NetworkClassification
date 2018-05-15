@@ -6,7 +6,7 @@ The thesis was enriched to [arXiv](https://arxiv.org/abs/1710.11304) with the ti
 Characterizing the structural diversity of complex networks across domains".
 
 ## Data
-First thing first, we need data in order to analyze something. Code in this repo
+First things first, we need data in order to analyze something. Code in this repo
  assumes the data, namely features of networks, is stored in a csv file named
  `features.csv` which looks like this:
 
@@ -15,6 +15,9 @@ First thing first, we need data in order to analyze something. Code in this repo
 some.gml,Social,Offline Social,62,152,4.9032,2.9455,...
 another.gml,Social,Offline Social,62,152,4.9032,2.9455,...
 ```
+
+The `.gmlFile`, `NetworkType`, and `SubType` are necessary fields,
+while `NumberOfNodes`, `NumberOfEdges`, `MeanDegree`, etc. are features associated with the data.
 
 ## Analyses
 The two main tasks in the research are accomplished by the two scripts, `one_by_many.py` and `multi_run.py`.

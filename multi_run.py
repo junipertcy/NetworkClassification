@@ -1,4 +1,3 @@
-from __future__ import division
 import math
 import numpy as np
 from preprocess import init
@@ -8,9 +7,12 @@ from plot import plot_feature_importance
 from plot import index_to_color
 from plot import MDS_plot
 import matplotlib.pyplot as plt
-import pylab
+# import pylab
 import scipy.cluster.hierarchy as sch
 import networkx as nx
+
+import click
+
 
 colors_domain = ["#ff0000", "#9c8110", "#00d404", "#00a4d4", "#1d00d4", "#a400c3", "#831e1e"]
 
@@ -33,7 +35,7 @@ def sum_confusion_matrix(X, Y, sub_to_main_type, feature_order, isSubType, sampl
 
 def make_symmetric(cm):
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    cm_normalized_filtered = map(lambda ax: map(lambda val: 0.0 if math.isnan(val) else val, ax), cm_normalized)
+    cm_normalized_filtered = list(map(lambda ax: list(map(lambda val: 0.0 if math.isnan(val) else val, ax)), cm_normalized))
     N = len(cm_normalized_filtered)
 
     # make cm symmetric
@@ -58,7 +60,7 @@ def make_symmetric(cm):
 def build_dendrogram(D, leave_name, sub_to_main_type, isSubType):
     Domains = list(set(sub_to_main_type.values()))
     color_map = index_to_color(Domains, "jet")
-    fig = pylab.figure(figsize=(10, 10))
+    fig = plt.figure(figsize=(10, 10))
     Y = sch.linkage(D, method='complete')  # , method='centroid')
     Z1 = sch.dendrogram(Y, orientation='right', labels=leave_name)
     ax = plt.gca()
@@ -81,15 +83,15 @@ def build_dendrogram(D, leave_name, sub_to_main_type, isSubType):
 
 
 def min_or_max(G, func=max):
-    return func([attr["weight"] for i, j, attr in G.edges_iter(data=True)])
+    return func([attr["weight"] for i, j, attr in G.edges(data=True)])
 
 
 def threshold(G, alpha):
     thresholded_graph = nx.Graph()
 
-    for u, v, w, in G.edges_iter(data='weight'):
+    for u, v, w, in G.edges(data='weight'):
         if w > alpha:
-            thresholded_graph.add_edge(u, v, weight=w["weight"] * 50)
+            thresholded_graph.add_edge(u, v, weight=w * 50)
 
     return thresholded_graph
 
@@ -117,10 +119,9 @@ def graph_draw(G, NetworkTypeLabels, sub_to_main_type):
     nx.draw_networkx_labels(G, pos=pos, labels=labels, font_size=11)
     edge_alpha = map(lambda x: round(x, 4), np.linspace(0.25, 0.8, n))
 
-    for e, v, w in list(G.edges_iter(data='weight')):
-        print
-        "e,v,w:", (e, v, w)
-        nx.draw_networkx_edges(G, pos=pos, edgelist=[(e, v)], alpha=0.6, width=w["weight"] * 0.2)
+    for e, v, w in list(G.edges(data='weight')):
+        print("e,v,w:", (e, v, w))
+        nx.draw_networkx_edges(G, pos=pos, edgelist=[(e, v)], alpha=0.6, width=w * 0.2)
 
     nx.draw_networkx_nodes(G, pos=pos, nodelist=G.nodes(), node_size=250, node_color=colors, alpha=0.6)
 
@@ -130,7 +131,7 @@ def graph_draw(G, NetworkTypeLabels, sub_to_main_type):
 
 def make_adj_matrix(cm):
     cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
-    cm_normalized_filtered = map(lambda ax: map(lambda val: 0.0 if math.isnan(val) else val, ax), cm_normalized)
+    cm_normalized_filtered = list(map(lambda ax: list(map(lambda val: 0.0 if math.isnan(val) else val, ax)), cm_normalized))
     N = len(cm_normalized_filtered)
 
     # make cm symmetric
@@ -146,16 +147,24 @@ def make_adj_matrix(cm):
     return np.asarray(cm_normalized_filtered)
 
 
-def main():
+@click.command()
+@click.option('--csv', nargs=1, type=str, help='CSV data for the features.')
+@click.option('--feature', '-f', multiple=True)
+def main(csv, feature):
     # The order in this list should be the same as columns in features.csv
     # column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity",
     #                 "m4_1", "m4_2", "m4_3", "m4_4", "m4_5", "m4_6"]
-    column_names = ["NetworkType", "SubType", "sepal_length", "sepal_width", "petal_length", "petal_width"]
+    # features: "sepal_length", "sepal_width", "petal_length", "petal_width"
+    column_names = ["NetworkType", "SubType"]
+    column_names += list(feature)
+    print(column_names)
     isSubType = True
+
+    csv_file = csv
 
     # at_least is used for filtering out classes whose instance is below this threshold.
     at_least = 6
-    X, Y, sub_to_main_type, feature_order = init("iris.csv", column_names, isSubType, at_least)
+    X, Y, sub_to_main_type, feature_order = init(csv_file, column_names, isSubType, at_least)
 
     # the number of iteration for multi-class classification
     N = 10
@@ -168,7 +177,7 @@ def main():
     Matrix, NetworkTypeLabels, sum_accuracy, list_important_features = \
         sum_confusion_matrix(X, Y, sub_to_main_type, feature_order, isSubType, sampling_method, N)
 
-    average_matrix = np.asarray(map(lambda row: map(lambda e: e / N, row), Matrix))
+    average_matrix = np.asarray(list(map(lambda row: list(map(lambda e: e / N, row)), Matrix)))
     print("average accuracy: %f" % (float(sum_accuracy) / float(N)))
     plot_feature_importance(list_important_features, feature_order)
 

@@ -1,3 +1,5 @@
+venv/
+
 # Download the file at: https://github.com/stavskal/ADASYN
 adasyn.py
 # Byte-compiled / optimized / DLL files
