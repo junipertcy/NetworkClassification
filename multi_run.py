@@ -151,23 +151,37 @@ def make_adj_matrix(cm):
 @click.option('--csv', nargs=1, type=str, help='CSV data for the features.')
 @click.option('--feature', '-f', multiple=True)
 def main(csv, feature):
+    """
+    Draw a bar chart that ranks the importance of feature combinations in order.
+
+    Parameters
+    ----------
+    csv: `str`
+        Path to csv file that contains the features.
+    feature: `str`
+        Name of the feature(s) for the random forest classifier.
+
+    Returns
+    -------
+
+    """
     # The order in this list should be the same as columns in features.csv
     # column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity",
     #                 "m4_1", "m4_2", "m4_3", "m4_4", "m4_5", "m4_6"]
     # features: "sepal_length", "sepal_width", "petal_length", "petal_width"
     column_names = ["NetworkType", "SubType"]
     column_names += list(feature)
-    print(column_names)
+
     isSubType = True
 
     csv_file = csv
 
     # at_least is used for filtering out classes whose instance is below this threshold.
-    at_least = 6
+    at_least = 0
     X, Y, sub_to_main_type, feature_order = init(csv_file, column_names, isSubType, at_least)
 
     # the number of iteration for multi-class classification
-    N = 10
+    N = 1000
 
     # Valid methods are: "RandomOver", "RandomUnder", "SMOTE" and "None"
     sampling_method = "None"
@@ -181,19 +195,19 @@ def main(csv, feature):
     print("average accuracy: %f" % (float(sum_accuracy) / float(N)))
     plot_feature_importance(list_important_features, feature_order)
 
-    if not isSubType:
-        sub_to_main_type = {v: v for v in sub_to_main_type.values()}
-    plot_confusion_matrix(average_matrix, NetworkTypeLabels, sub_to_main_type, isSubType)
-
-    dist_matrix = make_symmetric(average_matrix)
-
-    MDS_plot(dist_matrix, NetworkTypeLabels, sub_to_main_type)
-
-    # construct an adjacency matrix from the aggrregated confusion matrix.
-    adj_matrix = make_adj_matrix(average_matrix)
-
-    G = nx.from_numpy_matrix(np.asarray(adj_matrix))
-    graph_draw(G, NetworkTypeLabels, sub_to_main_type)
+    # if not isSubType:
+    #     sub_to_main_type = {v: v for v in sub_to_main_type.values()}
+    # plot_confusion_matrix(average_matrix, NetworkTypeLabels, sub_to_main_type, isSubType)
+    #
+    # dist_matrix = make_symmetric(average_matrix)
+    #
+    # MDS_plot(dist_matrix, NetworkTypeLabels, sub_to_main_type)
+    #
+    # # construct an adjacency matrix from the aggrregated confusion matrix.
+    # adj_matrix = make_adj_matrix(average_matrix)
+    #
+    # G = nx.from_numpy_matrix(np.asarray(adj_matrix))
+    # graph_draw(G, NetworkTypeLabels, sub_to_main_type)
 
     # uncomment if want to save an unweighted network.
     # nx.write_edgelist(G, "G_%s.txt"%sampling_method)

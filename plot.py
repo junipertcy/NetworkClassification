@@ -6,7 +6,6 @@ import scipy.cluster.hierarchy as sch
 import matplotlib.pyplot as plt
 import matplotlib.colors
 import matplotlib.cm as cmx
-from mpl_toolkits.mplot3d import Axes3D
 from preprocess import *
 
 import click
@@ -16,7 +15,20 @@ colors_domain = ["#ff0000", "#9c8110", "#00d404", "#00a4d4", "#1d00d4", "#a400c3
 
 
 def isFloat(x):
-    """checks if the input x is float number"""
+    """
+    Checks if the input x is float number.
+
+    Parameters
+    ----------
+    x: `float`
+        input variable.
+
+    Returns
+    -------
+    is_float: `bool`
+        Return `True` if x is float, else `False`
+
+    """
     try:
         float(x)
         return True
@@ -26,10 +38,18 @@ def isFloat(x):
 
 def index_to_color(iterator, colotType):
     """
-    :param iterator: some iterator (e.g. list of strings).
-    :param colotType: a string indicating color type (e.g. "jet").
-    :return:
+
+    Parameters
+    ----------
+    iterator:
+        some iterator (e.g. list of strings).
+    colotType:
+        a string indicating color type (e.g. "jet").
+    Returns
+    -------
+    function:
         a function that maps an index in the given iterator to a color in the color map.
+
     """
     jet = plt.get_cmap(colotType)
     cNorm = matplotlib.colors.Normalize(vmin=0, vmax=len(iterator))
@@ -218,8 +238,8 @@ def plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=False, ylog_sca
 
     color_map = index_to_color(ts, "hsv")
 
-    color_select = lambda x: "r" if x == "Other" else "b"
-    marker_select = lambda x: "o" if x == "Other" else ","
+    color_select = lambda x: "r" if x == "seed" else "b"
+    marker_select = lambda x: "o" if x == "seed" else ","
 
     ax = plt.subplot(111)
 
@@ -235,7 +255,7 @@ def plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=False, ylog_sca
                         marker=marker_select(label),
                         s=60,
                         edgecolors="k"
-                        )
+            )
         else:
 
             plt.scatter(x=X[:, x_index][Y == label],
@@ -246,7 +266,7 @@ def plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=False, ylog_sca
                         marker=marker_select(label),
                         s=60,
                         edgecolors="k"
-                        )
+            )
 
     plt.xlabel(x_label, fontsize=20)
     plt.ylabel(y_label, fontsize=20)
@@ -381,10 +401,15 @@ def plot_feature_importance(Ls, feature_order):
 
     for i, k in enumerate(iterate[1:]):
         colorVal = color_map(i + 1)
-
-        # TODO: hot-fix; re-write it later
-        # p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal), bottom=list(prev))
-        p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal))
+        try:
+            p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal), bottom=list(map(float, prev)))
+        except ValueError:
+            # TODO: why there may be ValueError??
+            print("== ValueError ==")
+            print(list(range(1, len(feature_order) + 1)))
+            print(list(map(float, freq[k])))
+            print(list(colorVal))
+            print(list(prev))
 
         who_is_dominant.append(map(lambda x: (k, x), freq[k]))
         prev = map(lambda x: x[0] + x[1], zip(prev, freq[k]))
@@ -432,10 +457,10 @@ def main2(csv, features):
     at_least = 0
     X, Y, sub_to_main_type, feature_order = init(csv_file, column_names, isSubType, at_least,
                                                  exclusive_types=exclusive_types)
-    # x_index = list(feature_order).index(x_label)
-    # y_index = list(feature_order).index(y_label)
-    x_index = 0  # TODO: hot-fix
-    y_index = 1
+    x_index = list(feature_order).index(x_label)
+    y_index = list(feature_order).index(y_label)
+    # x_index = 0  # TODO: hot-fix
+    # y_index = 1
     plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=True, ylog_scale=True)
 
 

@@ -80,16 +80,30 @@ def XY_filter_unpopular(X, Y, threshold):
 
 def init(filepath, column_names, isSubType, at_least, **kwargs):
     """
-    :param filepath: path to a file containing feature values (e.g. features.csv).
-    :param column_names: names of columns in the csv file to be read. E.g. ["NetworkType","SubType","Modularity",...]
-    :param isSubType: flag for if labels in Y are network subtypes or not.
-    :param at_least: integer threshold for filtering the minority classes below the number
-    :return:
-        X: numpy array for features.
-        Y: numpy array for class labels.
-        sub_to_main_type: dict mapping network sub-type to network type.
-        feature_order: a list of strings (features' names) ordered for the feature array X.
-                       That is, columns of X correspond to feature_order.
+
+    Parameters
+    ----------
+    filepath:
+        path to a file containing feature values (e.g. features.csv).
+    column_names:
+        names of columns in the csv file to be read. E.g. ["NetworkType","SubType","Modularity",...]
+    isSubType:
+        flag for if labels in Y are network subtypes or not.
+    at_least:
+        integer threshold for filtering the minority classes below the number
+    kwargs
+
+    Returns
+    -------
+    X:
+        numpy array for features.
+    Y:
+        numpy array for class labels.
+    sub_to_main_type:
+        dict mapping network sub-type to network type.
+    feature_order:
+        a list of strings (features' names) ordered for the feature array X.
+        That is, columns of X correspond to feature_order.
 
     """
     network_dict = data_read(filepath, *column_names, **kwargs)

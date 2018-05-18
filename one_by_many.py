@@ -85,18 +85,19 @@ def main():
     #                 "m4_4", "m4_5", "m4_6"]
     # column_names = ["NetworkType", "SubType", "MeanDegree", "MeanGeodesicDistance", "Modularity"]
 
-    column_names = ["NetworkType", "SubType", "sepal_length", "sepal_width", "petal_length", "petal_width"]
+    column_names = ["NetworkType", "SubType", "degree", "betweenness", "closeness", "eigencentrality", "coreness", "layerness", "pagerank", "sum_friends_friends", "transitivity"]
 
     isSubType = True  # use SubType as the labels for classification
     at_least = 0
-    X, Y, sub_to_main_type, feature_order = init("iris.csv", column_names, isSubType, at_least)
+    X, Y, sub_to_main_type, feature_order = init("dataset/nodes.csv", column_names, isSubType, at_least)
 
-    N = 14
+    N = 100
 
     # network subtype one is interested in
-    one = "versicolor"
+    one = "seed"
 
     X_converted, Y_converted = convert_one_to_many(X, Y, one)
+
     print("Y_converted: {}".format(Y_converted))
     list_accuracies, list_important_features, list_auc = many_classifications(
         X_converted, Y_converted, feature_order, N
