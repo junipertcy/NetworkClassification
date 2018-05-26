@@ -5,10 +5,22 @@ from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
 
+import click
+
 
 def convert_one_to_many(X, Y, label):
     """
     Convert multi-class labels into binary class labels. The argument label corresponds to the label of interest.
+
+    Parameters
+    ----------
+    X
+    Y
+    label
+
+    Returns
+    -------
+
     """
     X_converted = []
     Y_converted = []
@@ -26,11 +38,20 @@ def convert_one_to_many(X, Y, label):
 def split_train_test(X, Y):
     """
     Split the data set into training and test sets.
+
+    Parameters
+    ----------
+    X
+    Y
+
+    Returns
+    -------
+
     """
     X = np.array(X)
     Y = np.array(Y)
 
-    sss = StratifiedShuffleSplit(n_splits=3, test_size=0.4, random_state=0)
+    sss = StratifiedShuffleSplit(n_splits=10, test_size=0.3, random_state=0)
     for train_index, test_index in sss.split(X, Y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = Y[train_index], Y[test_index]
@@ -41,9 +62,20 @@ def split_train_test(X, Y):
 def one_to_many_classification(X_train, X_test, y_train, y_test, feature_order):
     """
     Binary classification of one kind vs. others (many).
-    """
 
-    random_forest = RandomForestClassifier()
+    Parameters
+    ----------
+    X_train
+    X_test
+    y_train
+    y_test
+    feature_order
+
+    Returns
+    -------
+
+    """
+    random_forest = RandomForestClassifier(n_estimators=100, criterion='gini', oob_score=False, max_features="log2")
     random_forest.fit(X_train, y_train)
 
     accuracy = random_forest.score(X_test, y_test)
@@ -53,23 +85,33 @@ def one_to_many_classification(X_train, X_test, y_train, y_test, feature_order):
         zip(map(lambda x: round(x, 4), random_forest.feature_importances_), feature_order), reverse=True
     )
 
-    print("y_test:{}; y_pred:{}".format(y_test, y_pred))
+    # print("[Binary classification] y_test:{}; y_pred:{}".format(y_test, y_pred))
     AUC = roc_auc_score(y_test, y_pred)
-
     return accuracy, feature_importance, AUC
 
 
 def many_classifications(X, Y, feature_order, N):
     """
     Does one_to_many_classification N times and aggregate the outputs from it.
+
+    Parameters
+    ----------
+    X
+    Y
+    feature_order
+    N
+
+    Returns
+    -------
+
     """
-    print("X: {}; Y: {}".format(X, Y))
+    # print("X: {}; Y: {}".format(X, Y))
 
     list_important_features = []
     list_accuracies = []
     list_auc = []
     for i in range(N):
-        print("i:%d" % i)
+        # print("i:%d" % i)
         X_train, X_test, y_train, y_test = split_train_test(X, Y)
         # print("X_train: {}; y_train:{}".format(X_train, y_train))
         accuracy, feature_importances, auc = one_to_many_classification(X_train, X_test, y_train, y_test, feature_order)
@@ -80,25 +122,26 @@ def many_classifications(X, Y, feature_order, N):
     return list_accuracies, list_important_features, list_auc
 
 
-def main():
-    # column_names = ["NetworkType", "SubType", "ClusteringCoefficient", "DegreeAssortativity", "m4_1", "m4_2", "m4_3",
-    #                 "m4_4", "m4_5", "m4_6"]
-    # column_names = ["NetworkType", "SubType", "MeanDegree", "MeanGeodesicDistance", "Modularity"]
+@click.command()
+@click.option('--csv', nargs=1, type=str, help='CSV data for the features.')
+@click.option('--features', '-f', multiple=True)
+@click.option('--iter', nargs=1, type=int, help='Number of iterations for the random forest.')
+def main(csv, features, iter):
+    # -f degree -f betweenness -f closeness -f eigencentrality -f coreness -f layerness -f pagerank -f sum_friends_friends -f transitivity
 
-    column_names = ["NetworkType", "SubType", "degree", "betweenness", "closeness", "eigencentrality", "coreness", "layerness", "pagerank", "sum_friends_friends", "transitivity"]
-
+    column_names = ["NetworkType", "SubType"] + list(features)
     isSubType = True  # use SubType as the labels for classification
     at_least = 0
-    X, Y, sub_to_main_type, feature_order = init("dataset/nodes.csv", column_names, isSubType, at_least)
 
-    N = 100
+    X, Y, sub_to_main_type, feature_order = init(csv, column_names, isSubType, at_least)
+
+    N = iter
 
     # network subtype one is interested in
     one = "seed"
 
     X_converted, Y_converted = convert_one_to_many(X, Y, one)
 
-    print("Y_converted: {}".format(Y_converted))
     list_accuracies, list_important_features, list_auc = many_classifications(
         X_converted, Y_converted, feature_order, N
     )
@@ -113,15 +156,13 @@ def main():
     if first == second:
         second = dominant_features[1][1][0]
 
-    Y_converted_string_labels = [one if y == 1 else "Other" for y in Y_converted]
-
-    print("first: ", first)
-    print("second: ", second)
+    Y_converted_string_labels = [one if y == 1 else "non-seed" for y in Y_converted]
 
     x_label = first
     y_label = second
     x_index = feature_order.index(x_label)
     y_index = feature_order.index(y_label)
+
     plot_2d(np.array(X_converted), np.array(Y_converted_string_labels), x_index, y_index, x_label, y_label)
 
 

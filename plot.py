@@ -1,7 +1,7 @@
 import math
 from sklearn import manifold
 from sklearn.decomposition import PCA
-import pylab
+import matplotlib.pylab as pylab
 import scipy.cluster.hierarchy as sch
 import matplotlib.pyplot as plt
 import matplotlib.colors
@@ -377,8 +377,20 @@ def matrix_clustering(D, leave_name):
 
 
 def plot_feature_importance(Ls, feature_order):
-    Ls = map(lambda x: map(lambda y: y[1], x), Ls)
-    # Ls = [("ClustersingCoefficient", "ClustersingCoefficient", ..),]
+    """
+    Plot aggregated rankings of feature importance. The height of a color bar indicates a frequency of the corresponding
+    specific feature being at the rank. The importance decreases along the _x_-axis.
+
+    Parameters
+    ----------
+    Ls
+    feature_order
+
+    Returns
+    -------
+
+    """
+    Ls = list(map(lambda x: list(map(lambda y: y[1], x)), Ls))
     Ls = zip(*Ls)
 
     freq = {f: [] for f in feature_order}
@@ -387,13 +399,16 @@ def plot_feature_importance(Ls, feature_order):
         for f in feature_order:
             freq[f].append(freq_fs.count(f))
 
-    color_map = index_to_color(freq, "jet")
+    color_map = index_to_color(freq.keys(), "jet")
+    # raise Exception
 
-    iterate = sorted(list(freq.keys()), key=lambda x: x, reverse=True)
+    iterate = sorted(freq.keys(), key=lambda x: x, reverse=True)
+    print(iterate)
 
     first = iterate[0]
     colorVal = color_map(0)
-    p = plt.bar(range(1, len(feature_order) + 1), freq[first], 0.35, color=colorVal)
+    p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[first])), 0.35, color=colorVal)
+
     prev = freq[first]  # previous stack
 
     ps = [p]  # storing axis objects
@@ -401,30 +416,20 @@ def plot_feature_importance(Ls, feature_order):
 
     for i, k in enumerate(iterate[1:]):
         colorVal = color_map(i + 1)
-        try:
-            p = plt.bar(list(range(1, len(feature_order) + 1)), list(map(float, freq[k])), 0.35, color=list(colorVal), bottom=list(map(float, prev)))
-        except ValueError:
-            # TODO: why there may be ValueError??
-            print("== ValueError ==")
-            print(list(range(1, len(feature_order) + 1)))
-            print(list(map(float, freq[k])))
-            print(list(colorVal))
-            print(list(prev))
-
-        who_is_dominant.append(map(lambda x: (k, x), freq[k]))
-        prev = map(lambda x: x[0] + x[1], zip(prev, freq[k]))
+        p = plt.bar(range(1, len(feature_order) + 1), list(map(float, freq[k])), 0.35, color=colorVal, bottom=list(map(float, prev)))
+        who_is_dominant.append(list(map(lambda x: (k, x), freq[k])))
+        prev = list(map(lambda x: x[0] + x[1], zip(prev, freq[k])))
         ps.append(p)
 
     ranking = []
 
     for rank in zip(*who_is_dominant):
-        print(sorted(rank, key=lambda x: x[1], reverse=True))
         ranking.append(sorted(rank, key=lambda x: x[1], reverse=True))
 
-    plt.legend(ps, iterate, bbox_to_anchor=(1.3, 0.4), prop={'size': 16})
+    plt.legend(ps, iterate, bbox_to_anchor=(0.3, 0.4), prop={'size': 16})
     plt.tick_params(axis='x', labelsize=20)
     plt.tick_params(axis='y', labelsize=20)
-    plt.xlim(0.75, 8.5)
+    plt.xlim(0.75, len(ranking) + 0.5)
     plt.xlabel('Feature Importance', fontsize=22)
     plt.ylabel('Frequency', fontsize=22)
 

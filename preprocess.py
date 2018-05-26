@@ -119,7 +119,7 @@ def init(filepath, column_names, isSubType, at_least, **kwargs):
     feature_order = map(lambda x: x[0], sorted(v.vocabulary_.items(), key=lambda x: x[1]))
 
     sub_to_main_type = dict((SubType, NetworkType) for gml, NetworkType, SubType in labels)
-    print("IMPORTANT labels: {}".format(labels))
+
     if isSubType:
         Y = np.array([SubType for gml, NetworkType, SubType in labels])
     else:

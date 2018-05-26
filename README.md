@@ -30,7 +30,24 @@ constraint and growing mechanism of those networks (if two distinct categories o
 
 Lastly, if one wants to see how the data points in a 2D or 3D feature space, `plot.py` contains some code for 2D and 3D visualization.
 
+## Example Usage
+To discriminate features using an individual feature approach, we select a set of seed and non-seed nodes as representative classes for investigation (i.e. input csv file `dataset/nodes.csv`).
 
+Second, for each representative class, we proceed to run binary classification (seed v.s. non-seed) `iter` times using
+random forest, in which the seed nodes of interest correspond to the positive and the other correspond to negative.
 
+A set of features for this task includes: `degree`, `betweenness`, `closeness`, `eigencentrality`, `coreness`, `layerness`, `pagerank`, `sum_friends_friends`, and `transitivity` (total of 9 features).
 
+In each run: 
+1. We split the data set into training and test sets with the ratio of `7:3` while preserving the ratio of class distribution.
+2. Compute AUC.
+3. Record the ranking of feature importance (sorted according to the Gini impurity decrease in the training phase of the RF classifier)
 
+This is accomplished by the following script:
+```commandline
+python one_by_many.py --csv dataset/nodes.csv -f degree -f betweenness -f closeness -f eigencentrality -f coreness -f layerness -f pagerank -f sum_friends_friends -f transitivity --iter 100
+```
+The script outputs:
+1. Average AUC score over the `iter` runs.
+2. Aggreated rankings of feature importance.
+3. A 2D plot for feature discrimination. The _x_-axis corresponds to the most important feature and the _y_-axis the second most important.
