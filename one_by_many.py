@@ -51,7 +51,7 @@ def split_train_test(X, Y):
     X = np.array(X)
     Y = np.array(Y)
 
-    sss = StratifiedShuffleSplit(n_splits=10, test_size=0.3, random_state=0)
+    sss = StratifiedShuffleSplit(n_splits=10000, test_size=0.3, random_state=0)
     for train_index, test_index in sss.split(X, Y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = Y[train_index], Y[test_index]
@@ -75,7 +75,7 @@ def one_to_many_classification(X_train, X_test, y_train, y_test, feature_order):
     -------
 
     """
-    random_forest = RandomForestClassifier(n_estimators=100, criterion='gini', oob_score=False, max_features="log2")
+    random_forest = RandomForestClassifier(n_estimators=5, criterion='gini', oob_score=False, max_features="log2")
     random_forest.fit(X_train, y_train)
 
     accuracy = random_forest.score(X_test, y_test)
@@ -111,7 +111,7 @@ def many_classifications(X, Y, feature_order, N):
     list_accuracies = []
     list_auc = []
     for i in range(N):
-        # print("i:%d" % i)
+        print("i:%d" % i)
         X_train, X_test, y_train, y_test = split_train_test(X, Y)
         # print("X_train: {}; y_train:{}".format(X_train, y_train))
         accuracy, feature_importances, auc = one_to_many_classification(X_train, X_test, y_train, y_test, feature_order)

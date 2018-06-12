@@ -277,11 +277,11 @@ def plot_2d(X, Y, x_index, y_index, x_label, y_label, xlog_scale=False, ylog_sca
     if ylog_scale:
         plt.yscale("log")
 
-    plt.legend(loc='upper right', fancybox=True, prop={'size': 15})  # ,bbox_to_anchor=(1.1, 1.05))
+    plt.legend(loc='upper right', fancybox=False, prop={'size': 15})  # ,bbox_to_anchor=(1.1, 1.05))
 
     plt.tight_layout
-    plt.show()
-
+    # plt.show()
+    plt.savefig('plot_2d_.pdf')
 
 def plot_scikit_lda(X, Y):
     ts = set(Y)
@@ -390,6 +390,7 @@ def plot_feature_importance(Ls, feature_order):
     -------
 
     """
+    plt.subplots(figsize=(6, 4), dpi=150)
     Ls = list(map(lambda x: list(map(lambda y: y[1], x)), Ls))
     Ls = zip(*Ls)
 
@@ -403,7 +404,6 @@ def plot_feature_importance(Ls, feature_order):
     # raise Exception
 
     iterate = sorted(freq.keys(), key=lambda x: x, reverse=True)
-    print(iterate)
 
     first = iterate[0]
     colorVal = color_map(0)
@@ -426,14 +426,14 @@ def plot_feature_importance(Ls, feature_order):
     for rank in zip(*who_is_dominant):
         ranking.append(sorted(rank, key=lambda x: x[1], reverse=True))
 
-    plt.legend(ps, iterate, bbox_to_anchor=(0.3, 0.4), prop={'size': 16})
-    plt.tick_params(axis='x', labelsize=20)
-    plt.tick_params(axis='y', labelsize=20)
+    # plt.legend(ps, iterate, prop={'size': 16}, loc='lower right', bbox_to_anchor=(1.1, 0))
+    plt.tick_params(axis='x', labelsize=14)
+    plt.tick_params(axis='y', labelsize=14)
     plt.xlim(0.75, len(ranking) + 0.5)
-    plt.xlabel('Feature Importance', fontsize=22)
-    plt.ylabel('Frequency', fontsize=22)
+    plt.xlabel('feature importance', fontsize=12)
+    plt.ylabel('frequency', fontsize=22)
 
-    plt.show()
+    plt.savefig("yo_.pdf")
 
     return ranking
 
